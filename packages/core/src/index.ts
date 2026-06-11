@@ -8,6 +8,8 @@ export * from './constitution/parser.js';
 export * from './constitution/checker.js';
 export * from './compression/types.js';
 export * from './tdd/types.js';
+export * from './tdd/tdd-fsm.js';
+export * from './tdd/restrictions.js';
 export * from './project/state.js';
 export * from './utils/fs.js';
 export * from './utils/paths.js';
