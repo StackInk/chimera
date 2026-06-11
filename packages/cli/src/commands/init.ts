@@ -12,6 +12,7 @@ import {
 import { ensureDir, writeJson, readJson, writeText } from '@chimera/core';
 
 const TEMPLATES_DIR = resolve(import.meta.dirname, '../../..', 'templates');
+const HOOKS_DIR = resolve(import.meta.dirname, '../../..', 'hooks');
 
 export interface InitOptions {
   preset?: string;
@@ -51,6 +52,9 @@ export function init(projectRoot: string, options: InitOptions = {}): void {
     }
   }
 
+  // Copy hook scripts to .chimera/hooks/
+  copyHooks(projectRoot);
+
   if (!options.skipHooks) {
     registerHooks(projectRoot);
   }
@@ -67,6 +71,13 @@ function copyTemplate(templateName: string, destPath: string): void {
   if (existsSync(srcPath)) {
     ensureDir(join(destPath, '..'));
     cpSync(srcPath, destPath);
+  }
+}
+
+function copyHooks(projectRoot: string): void {
+  const destHooks = hooksDir(projectRoot);
+  if (existsSync(HOOKS_DIR)) {
+    cpSync(HOOKS_DIR, destHooks, { recursive: true, force: true });
   }
 }
 
