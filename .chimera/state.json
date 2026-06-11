@@ -1,0 +1,9 @@
+{
+  "version": "0.1.0",
+  "initialized_at": "2026-06-11T06:46:04.450Z",
+  "features": [],
+  "config": {
+    "path": ".chimera/config.yaml",
+    "preset": "cli-tool"
+  }
+}

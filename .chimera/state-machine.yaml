@@ -1,0 +1,71 @@
+states:
+  idle:
+    initial: true
+  spec:
+    skills:
+      - specify
+      - clarify
+    knowledge_scope:
+      - business
+  plan:
+    skills:
+      - plan
+    knowledge_scope:
+      - business
+  tasks:
+    skills:
+      - tasks
+  workspace:
+    skills: []
+  implement:
+    skills:
+      - implement
+      - dispatch
+    knowledge_scope:
+      - conventions
+  review:
+    skills:
+      - review
+  finish:
+    skills:
+      - finish
+  archive:
+    final: true
+
+transitions:
+  - from: idle
+    to: spec
+    guard: has_feature_description
+  - from: spec
+    to: plan
+    guard: spec_file_exists
+  - from: plan
+    to: tasks
+    guard: plan_file_exists
+  - from: tasks
+    to: workspace
+    guard: tasks_file_exists
+  - from: workspace
+    to: implement
+    guard: worktree_ready
+  - from: implement
+    to: review
+    guard: all_tasks_done
+  - from: review
+    to: finish
+    guard: review_approved
+  - from: finish
+    to: archive
+    guard: merged_or_pr_created
+  - from: plan
+    to: spec
+    guard: user_confirmed_rollback
+    requires_confirmation: true
+  - from: tasks
+    to: plan
+    guard: user_confirmed_rollback
+    requires_confirmation: true
+  - from: implement
+    to: tasks
+    guard: user_confirmed_rollback
+    requires_confirmation: true

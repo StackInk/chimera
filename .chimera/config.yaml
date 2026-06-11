@@ -1,0 +1,19 @@
+version: 0.1.0
+
+tdd:
+  enabled: true
+  coverage_threshold: 100
+
+constitution:
+  enabled: true
+
+knowledge:
+  enabled: true
+
+compression:
+  enabled: true
+  engine: builtin
+  builtin:
+    json_max_keys: 20
+    code_max_lines: 50
+    prose_max_sentences: 5
