@@ -1,6 +1,7 @@
 export * from './types.js';
 export * from './state-machine/types.js';
 export * from './state-machine/fsm.js';
+export * from './state-machine/guards.js';
 export * from './knowledge/types.js';
 export * from './constitution/types.js';
 export * from './compression/types.js';

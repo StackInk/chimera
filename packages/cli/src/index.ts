@@ -3,6 +3,8 @@
 import { init } from './commands/init.js';
 import { status } from './commands/status.js';
 import { transition } from './commands/transition.js';
+import { finish } from './commands/finish.js';
+import type { FinishAction } from './commands/finish.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -64,6 +66,13 @@ switch (command) {
     });
     break;
   }
+
+  case 'finish':
+    finish(projectRoot, {
+      feature: flags.feature as string | undefined,
+      action: flags.action as FinishAction | undefined,
+    });
+    break;
 
   default:
     console.error(`Unknown command: ${command}`);
