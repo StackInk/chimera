@@ -17,6 +17,7 @@
     "@chimera/core": "*"
   },
   "devDependencies": {
+    "@types/node": "^25.9.3",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   },

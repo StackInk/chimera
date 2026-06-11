@@ -1,0 +1,9 @@
+{
+  "version": "0.1.0",
+  "initialized_at": "",
+  "features": [],
+  "config": {
+    "path": ".chimera/config.yaml",
+    "preset": "minimal"
+  }
+}
