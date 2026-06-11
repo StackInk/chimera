@@ -1,8 +1,9 @@
 {
   "name": "chimera-vscode",
   "displayName": "Chimera",
-  "description": "Chimera Framework - Project state dashboard",
+  "description": "Chimera Framework - Project state dashboard & Kanban board",
   "version": "0.1.0",
+  "publisher": "chimera-dev",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -11,14 +12,63 @@
     "workspaceContains:.chimera/state.json"
   ],
   "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "chimera",
+          "title": "Chimera",
+          "icon": "$(layers)"
+        }
+      ]
+    },
+    "views": {
+      "chimera": [
+        {
+          "type": "webview",
+          "id": "chimera.kanbanView",
+          "name": "Kanban Board"
+        },
+        {
+          "id": "chimera.knowledgeView",
+          "name": "Knowledge"
+        },
+        {
+          "id": "chimera.constitutionView",
+          "name": "Constitution"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "chimera.refresh",
+        "title": "Chimera: Refresh Views",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "chimera.openState",
+        "title": "Chimera: Open State File"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "chimera.refresh",
+          "when": "view =~ /chimera\\./",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "watch": "tsc -w",
+    "package": "vsce package",
+    "test": "echo 'VS Code extension tests require vscode test runner'"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.5.0",
-    "vitest": "^2.0.0"
+    "typescript": "^5.5.0"
   },
   "license": "MIT"
 }
