@@ -5,6 +5,7 @@ import { status } from './commands/status.js';
 import { transition } from './commands/transition.js';
 import { finish } from './commands/finish.js';
 import type { FinishAction } from './commands/finish.js';
+import { enable } from './commands/enable.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -73,6 +74,17 @@ switch (command) {
       action: flags.action as FinishAction | undefined,
     });
     break;
+
+  case 'enable': {
+    const cap = args[1];
+    if (!cap || cap.startsWith('--')) {
+      console.error('Usage: chimera enable <capability>');
+      console.error('Capabilities: constitution, tdd, knowledge, compression');
+      process.exit(1);
+    }
+    enable(projectRoot, cap);
+    break;
+  }
 
   default:
     console.error(`Unknown command: ${command}`);

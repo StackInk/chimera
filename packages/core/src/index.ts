@@ -13,3 +13,4 @@ export * from './tdd/restrictions.js';
 export * from './project/state.js';
 export * from './utils/fs.js';
 export * from './utils/paths.js';
+export * from './utils/harness-detect.js';
