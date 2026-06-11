@@ -1,17 +1,25 @@
 {
   "name": "@chimera/cli",
   "version": "0.1.0",
-  "description": "Chimera CLI tool",
+  "description": "Chimera CLI - State-driven AI development framework",
   "type": "module",
   "bin": {
     "chimera": "dist/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "../core/dist/",
+    "../templates/",
+    "../hooks/",
+    "../skills/"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@chimera/core": "*"
@@ -20,6 +28,11 @@
     "@types/node": "^25.9.3",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
+  },
+  "keywords": ["ai", "development", "framework", "state-machine", "tdd", "claude"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chimera-dev/chimera"
   },
   "engines": {
     "node": ">=18.0.0"
