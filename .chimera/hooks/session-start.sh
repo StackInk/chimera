@@ -141,6 +141,77 @@ if [ -n "$KNOWLEDGE_ENABLED" ]; then
   esac
 fi
 
+# ─── Archived Knowledge (summaries for reference) ────────────────────
+BLOCKS_DIR="$CHIMERA_DIR/archive/blocks"
+if [ -d "$BLOCKS_DIR" ] && [ -n "$(ls "$BLOCKS_DIR"/*.json 2>/dev/null)" ]; then
+  ACTIVE_COUNT=0
+  STALE_COUNT=0
+  INVALID_COUNT=0
+  ACTIVE_OUTPUT=""
+
+  for f in "$BLOCKS_DIR"/*.json; do
+    STATUS=$(grep -o '"status"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+    case "$STATUS" in
+      active)
+        ACTIVE_COUNT=$((ACTIVE_COUNT + 1))
+        if [ $ACTIVE_COUNT -le 10 ]; then
+          BID=$(grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+          BTITLE=$(grep -o '"title"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+          BSUMMARY=$(grep -o '"summary"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+          ACTIVE_OUTPUT="${ACTIVE_OUTPUT}    [${BID}] ${BTITLE}: ${BSUMMARY}\n"
+        fi
+        ;;
+      stale) STALE_COUNT=$((STALE_COUNT + 1)) ;;
+      invalidated) INVALID_COUNT=$((INVALID_COUNT + 1)) ;;
+    esac
+  done
+
+  if [ $ACTIVE_COUNT -gt 0 ]; then
+    echo "  ─── Archived Decisions (reference) ───"
+    echo -e "$ACTIVE_OUTPUT"
+    if [ $ACTIVE_COUNT -gt 10 ]; then
+      echo "    ... and $((ACTIVE_COUNT - 10)) more"
+    fi
+  fi
+
+  if [ $STALE_COUNT -gt 0 ]; then
+    echo "  ⚠ ${STALE_COUNT} knowledge block(s) STALE. Run 'chimera knowledge check'"
+  fi
+  if [ $INVALID_COUNT -gt 0 ]; then
+    echo "  ℹ ${INVALID_COUNT} block(s) invalidated (superseded by newer knowledge)"
+  fi
+  if [ $STALE_COUNT -gt 0 ] || [ $INVALID_COUNT -gt 0 ]; then
+    echo ""
+  fi
+
+  # ─── Drift scan (lightweight: check commit distance) ─────────────
+  DRIFT_WARNINGS=""
+  for f in "$BLOCKS_DIR"/*.json; do
+    STATUS=$(grep -o '"status"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+    [ "$STATUS" != "active" ] && continue
+
+    GIT_REF=$(grep -o '"git_ref"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+    [ -z "$GIT_REF" ] && continue
+
+    COMMIT_DIST=$(git rev-list --count "$GIT_REF"..HEAD 2>/dev/null || echo 0)
+    if [ "$COMMIT_DIST" -gt 50 ]; then
+      BID=$(grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+      # Auto-mark as stale
+      sed -i '' "s/\"status\"[[:space:]]*:[[:space:]]*\"active\"/\"status\": \"stale\"/" "$f" 2>/dev/null || \
+        sed -i "s/\"status\"[[:space:]]*:[[:space:]]*\"active\"/\"status\": \"stale\"/" "$f"
+      DRIFT_WARNINGS="${DRIFT_WARNINGS}    [${BID}] ${COMMIT_DIST} commits since creation → marked STALE\n"
+    elif [ "$COMMIT_DIST" -gt 20 ]; then
+      BID=$(grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' "$f" | grep -o '"[^"]*"$' | tr -d '"')
+      DRIFT_WARNINGS="${DRIFT_WARNINGS}    [${BID}] ${COMMIT_DIST} commits since creation → may need review\n"
+    fi
+  done
+
+  if [ -n "$DRIFT_WARNINGS" ]; then
+    echo "  ─── Drift Detection ───"
+    echo -e "$DRIFT_WARNINGS"
+  fi
+fi
+
 # ─── Constitution summary ────────────────────────────────────────────
 CONST_ENABLED=$(grep -A1 "^constitution:" "$CONFIG_FILE" 2>/dev/null | grep "enabled: true")
 

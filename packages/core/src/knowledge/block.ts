@@ -62,6 +62,10 @@ export class KnowledgeBlockStore {
     return files.map(f => readJson<KnowledgeBlock>(join(this.blocksDir, f))!).filter(Boolean);
   }
 
+  listByStatus(status: KnowledgeStatus): KnowledgeBlock[] {
+    return this.list().filter(b => b.status === status);
+  }
+
   private getNextCounter(): number {
     const files = readdirSync(this.blocksDir).filter(f => f.startsWith('kb-'));
     if (files.length === 0) return 1;
