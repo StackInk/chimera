@@ -4,6 +4,8 @@ export * from './state-machine/fsm.js';
 export * from './state-machine/guards.js';
 export * from './knowledge/types.js';
 export * from './constitution/types.js';
+export * from './constitution/parser.js';
+export * from './constitution/checker.js';
 export * from './compression/types.js';
 export * from './tdd/types.js';
 export * from './project/state.js';
