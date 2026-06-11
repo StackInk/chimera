@@ -7,6 +7,7 @@ import { finish } from './commands/finish.js';
 import type { FinishAction } from './commands/finish.js';
 import { enable } from './commands/enable.js';
 import { knowledge } from './commands/knowledge.js';
+import { doctor } from './commands/doctor.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -96,6 +97,10 @@ switch (command) {
     knowledge(projectRoot, sub, args.slice(2));
     break;
   }
+
+  case 'doctor':
+    doctor(projectRoot);
+    break;
 
   default:
     console.error(`Unknown command: ${command}`);

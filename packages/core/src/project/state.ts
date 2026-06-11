@@ -1,6 +1,7 @@
 import type { ProjectState, FeatureState, Phase } from '../types.js';
-import { readJson, writeJson } from '../utils/fs.js';
-import { statePath } from '../utils/paths.js';
+import { readJson, writeJson, ensureDir } from '../utils/fs.js';
+import { statePath, chimeraDir } from '../utils/paths.js';
+import { join } from 'node:path';
 
 export class ProjectStateManager {
   private projectRoot: string;
@@ -48,6 +49,9 @@ export class ProjectStateManager {
 
     state.features.push(feature);
     this.save(state);
+
+    ensureDir(join(chimeraDir(this.projectRoot), 'features', id));
+
     return feature;
   }
 

@@ -103,6 +103,9 @@ function registerHooks(projectRoot: string): void {
     PostToolUse: [
       { matcher: 'Write|Edit', command: '.chimera/hooks/post-tool-use.sh "$TOOL_NAME" "$FILE_PATH"' },
     ],
+    PreCommit: [
+      { command: '.chimera/hooks/pre-commit.sh' },
+    ],
     SessionStart: [
       { command: '.chimera/hooks/session-start.sh' },
     ],

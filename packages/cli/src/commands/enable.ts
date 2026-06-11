@@ -62,6 +62,17 @@ function enableTdd(config: string, projectRoot: string): void {
   const updated = config.replace(/tdd:\s*\n\s*enabled:\s*false/, 'tdd:\n  enabled: true');
   writeText(configPath(projectRoot), updated);
 
+  // Create tdd-state.json if not exists
+  const tddPath = join(chimeraDir(projectRoot), 'tdd-state.json');
+  if (!existsSync(tddPath)) {
+    const tddTemplateSrc = join(TEMPLATES_DIR, 'tdd-state.json');
+    if (existsSync(tddTemplateSrc)) {
+      cpSync(tddTemplateSrc, tddPath);
+    } else {
+      writeText(tddPath, JSON.stringify({ feature: '', task: '', cycle: 'red', test_file: null, src_file: null, cycles_completed: 0 }, null, 2));
+    }
+  }
+
   console.log('[Chimera] TDD mode enabled.');
   console.log('  Red-Green-Refactor will be enforced via hooks.');
 }

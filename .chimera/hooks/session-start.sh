@@ -15,9 +15,23 @@ if [ ! -f "$STATE_FILE" ]; then
   exit 0
 fi
 
+# ─── Quick integrity warnings ─────────────────────────────────────────
+WARNINGS=""
+if [ ! -d "$CHIMERA_DIR/skills" ] || [ -z "$(ls -A "$CHIMERA_DIR/skills" 2>/dev/null)" ]; then
+  WARNINGS="${WARNINGS}  [WARNING] Skills directory missing or empty. Run 'chimera doctor --fix'\n"
+fi
+if [ ! -f "$CONFIG_FILE" ]; then
+  WARNINGS="${WARNINGS}  [WARNING] config.yaml missing. Run 'chimera doctor --fix'\n"
+fi
+
 # ─── Parse state ──────────────────────────────────────────────────────
 VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
 PRESET=$(grep -o '"preset"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
+
+# Output warnings first if any
+if [ -n "$WARNINGS" ]; then
+  echo -e "$WARNINGS"
+fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Chimera v${VERSION} (preset: ${PRESET})"

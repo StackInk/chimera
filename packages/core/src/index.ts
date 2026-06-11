@@ -25,3 +25,4 @@ export * from './dispatch/dag.js';
 export * from './dispatch/scheduler.js';
 export * from './dispatch/orchestrator.js';
 export * from './dispatch/review-protocol.js';
+export * from './doctor/checks.js';
