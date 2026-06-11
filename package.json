@@ -1,0 +1,18 @@
+{
+  "name": "chimera",
+  "version": "0.1.0",
+  "private": true,
+  "description": "State-driven AI development framework",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "clean": "rm -rf packages/*/dist"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

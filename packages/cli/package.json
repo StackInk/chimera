@@ -1,0 +1,27 @@
+{
+  "name": "@chimera/cli",
+  "version": "0.1.0",
+  "description": "Chimera CLI tool",
+  "type": "module",
+  "bin": {
+    "chimera": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@chimera/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
