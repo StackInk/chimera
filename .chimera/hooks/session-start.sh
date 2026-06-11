@@ -68,6 +68,18 @@ if [ -n "$CURRENT_PHASE" ] && [ -f "$SM_FILE" ]; then
   if [ -n "$SKILLS" ]; then
     echo "  Available Skills:$SKILLS"
     echo ""
+
+    # Inject primary skill content for current phase
+    PRIMARY_SKILL=$(echo "$SKILLS" | awk '{print $1}')
+    SKILL_FILE="$CHIMERA_DIR/skills/$PRIMARY_SKILL/SKILL.md"
+    if [ -f "$SKILL_FILE" ]; then
+      echo "  ─── Active Skill: $PRIMARY_SKILL ───"
+      # Output skill content (skip the title line)
+      tail -n +3 "$SKILL_FILE" | head -30
+      echo ""
+      echo "  (Full skill: .chimera/skills/$PRIMARY_SKILL/SKILL.md)"
+      echo ""
+    fi
   fi
 fi
 
