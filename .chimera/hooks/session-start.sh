@@ -132,24 +132,38 @@ if [ -n "$CONST_ENABLED" ] && [ -f "$CONSTITUTION" ]; then
   echo ""
 fi
 
-# ─── Guidance ─────────────────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [ -z "$FEATURES" ]; then
-  echo "  Tell me what you want to build and I'll guide you through"
-  echo "  the full development lifecycle: spec → plan → implement."
-elif [ "$CURRENT_PHASE" = "idle" ]; then
-  echo "  Describe the feature requirements to begin the spec phase."
-elif [ "$CURRENT_PHASE" = "spec" ]; then
-  echo "  I'll help clarify requirements. Ask questions or propose approaches."
-elif [ "$CURRENT_PHASE" = "plan" ]; then
-  echo "  Let's design the technical solution. Architecture, data model, contracts."
-elif [ "$CURRENT_PHASE" = "tasks" ]; then
-  echo "  Breaking down into executable tasks (2-5 min each, TDD)."
-elif [ "$CURRENT_PHASE" = "implement" ]; then
-  echo "  Implementing via TDD. Red→Green→Refactor. Multi-agent dispatch available."
-elif [ "$CURRENT_PHASE" = "review" ]; then
-  echo "  Reviewing: spec compliance + code quality. Two-stage review."
-elif [ "$CURRENT_PHASE" = "finish" ]; then
-  echo "  Ready to wrap up: merge, PR, keep, or discard."
-fi
+# ─── Bootstrap Behavior Rules ─────────────────────────────────────────
+CURRENT_PHASE="${CURRENT_PHASE:-idle}"
+echo ""
+echo "  [Chimera Rules]"
+echo "  1. State machine is the authority. Never skip phases."
+echo "  2. Phase determines allowed actions:"
+case "$CURRENT_PHASE" in
+  idle|"")
+    echo "     → Ask what user wants to build. Any description → create feature → spec" ;;
+  spec)
+    echo "     → Clarify requirements, write spec.md. NO code, NO implementation files." ;;
+  plan)
+    echo "     → Design architecture, write plan.md. Check constitution gate. NO code." ;;
+  tasks)
+    echo "     → Decompose into 2-5 min tasks with file paths. Write tasks.md." ;;
+  workspace)
+    echo "     → Create worktree, install deps, verify baseline." ;;
+  implement)
+    echo "     → TDD only: Red(test)→Green(src)→Refactor. Multi-agent dispatch available." ;;
+  review)
+    echo "     → Two-stage review: spec compliance + code quality." ;;
+  finish)
+    echo "     → Choose: merge / PR / keep / discard. Run tests first." ;;
+esac
+echo "  3. Constitution MUST rules = hard block. SHOULD = warning."
+echo "  4. TDD is non-negotiable (when enabled). No src without failing test."
+echo "  5. Cross-phase operations require explicit user confirmation."
+echo ""
+echo "  [Red Flags — if you think these, STOP]"
+echo "  - \"Too simple for TDD\" → Write the test."
+echo "  - \"I'll spec later\" → Hidden requirements will bite."
+echo "  - \"The rule doesn't apply here\" → If MUST, it applies."
+echo "  - \"Let me skip to implement\" → Transition properly."
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

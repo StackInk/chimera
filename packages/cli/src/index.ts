@@ -6,6 +6,7 @@ import { transition } from './commands/transition.js';
 import { finish } from './commands/finish.js';
 import type { FinishAction } from './commands/finish.js';
 import { enable } from './commands/enable.js';
+import { knowledge } from './commands/knowledge.js';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -83,6 +84,16 @@ switch (command) {
       process.exit(1);
     }
     enable(projectRoot, cap);
+    break;
+  }
+
+  case 'knowledge': {
+    const sub = args[1];
+    if (!sub || sub.startsWith('--')) {
+      console.error('Usage: chimera knowledge <check|read|archive> [args]');
+      process.exit(1);
+    }
+    knowledge(projectRoot, sub, args.slice(2));
     break;
   }
 

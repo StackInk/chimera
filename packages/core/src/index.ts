@@ -6,6 +6,7 @@ export * from './knowledge/types.js';
 export * from './knowledge/loader.js';
 export * from './knowledge/block.js';
 export * from './knowledge/expiry.js';
+export * from './knowledge/drift.js';
 export * from './constitution/types.js';
 export * from './constitution/parser.js';
 export * from './constitution/checker.js';
