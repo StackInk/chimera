@@ -19,3 +19,8 @@ export * from './project/state.js';
 export * from './utils/fs.js';
 export * from './utils/paths.js';
 export * from './utils/harness-detect.js';
+export * from './skills/registry.js';
+export * from './dispatch/dag.js';
+export * from './dispatch/scheduler.js';
+export * from './dispatch/orchestrator.js';
+export * from './dispatch/review-protocol.js';
