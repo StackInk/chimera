@@ -5,6 +5,7 @@ import { readText, writeText, ensureDir } from '@chimera/core';
 import { chimeraDir, configPath, constitutionPath, knowledgeDir } from '@chimera/core';
 
 const TEMPLATES_DIR = resolve(import.meta.dirname, '../../..', 'templates');
+const SKILLS_DIR = resolve(import.meta.dirname, '../../..', 'skills');
 
 export type Capability = 'constitution' | 'tdd' | 'knowledge' | 'compression' | 'codegraph';
 
@@ -121,6 +122,14 @@ function enableCodegraph(projectRoot: string, config: string): void {
     'codegraph:\n      enabled: true',
   );
   writeText(configPath(projectRoot), updated);
+
+  // Copy codegraph skill to .chimera/skills/
+  const skillSrc = join(SKILLS_DIR, 'codegraph');
+  const skillDst = join(chimeraDir(projectRoot), 'skills', 'codegraph');
+  if (existsSync(skillSrc)) {
+    ensureDir(skillDst);
+    cpSync(skillSrc, skillDst, { recursive: true, force: true });
+  }
 
   console.log('[Chimera] CodeGraph provider enabled.');
 

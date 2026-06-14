@@ -10,6 +10,7 @@ states:
   plan:
     skills:
       - plan
+      - codegraph
     knowledge_scope:
       - business
   tasks:
@@ -21,11 +22,13 @@ states:
     skills:
       - implement
       - dispatch
+      - codegraph
     knowledge_scope:
       - conventions
   review:
     skills:
       - review
+      - codegraph
   finish:
     skills:
       - finish
