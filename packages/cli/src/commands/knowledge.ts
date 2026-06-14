@@ -1,10 +1,10 @@
-import { KnowledgeBlockStore, checkExpiry } from '@chimera/core';
+import { KnowledgeBlockStore, checkExpiry, loadProviders, searchAll, formatResultsForInjection } from '@chimera/core';
 import { archiveBlocksDir } from '@chimera/core';
 import { existsSync, readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 
-export type KnowledgeSubcommand = 'check' | 'read' | 'archive';
+export type KnowledgeSubcommand = 'check' | 'read' | 'archive' | 'search';
 
 export function knowledge(projectRoot: string, subcommand: string, args: string[]): void {
   switch (subcommand) {
@@ -17,9 +17,15 @@ export function knowledge(projectRoot: string, subcommand: string, args: string[
     case 'archive':
       knowledgeArchive(projectRoot, args[0]);
       break;
+    case 'search':
+      knowledgeSearch(projectRoot, args).catch(err => {
+        console.error('Search failed:', err);
+        process.exit(1);
+      });
+      break;
     default:
       console.error(`Unknown subcommand: ${subcommand}`);
-      console.error('Usage: chimera knowledge <check|read|archive>');
+      console.error('Usage: chimera knowledge <check|read|archive|search>');
       process.exit(1);
   }
 }
@@ -88,6 +94,53 @@ function knowledgeRead(projectRoot: string, blockId: string): void {
   }
 
   console.log(block.content);
+}
+
+async function knowledgeSearch(projectRoot: string, args: string[]): Promise<void> {
+  // Parse flags: chimera knowledge search <query> [--max N]
+  const query = args.find(a => !a.startsWith('--'));
+  if (!query) {
+    console.error('Usage: chimera knowledge search <query> [--max N]');
+    process.exit(1);
+  }
+
+  let maxResults = 5;
+  const maxIdx = args.indexOf('--max');
+  if (maxIdx !== -1 && args[maxIdx + 1]) {
+    maxResults = Number(args[maxIdx + 1]) || 5;
+  }
+
+  const providers = loadProviders(projectRoot);
+  if (providers.length === 0) {
+    console.log('No knowledge providers configured.');
+    console.log('Enable codegraph: chimera enable codegraph');
+    return;
+  }
+
+  console.log(`Searching "${query}" across ${providers.length} provider(s)...`);
+  console.log('');
+
+  const response = await searchAll(providers, query, { maxResults });
+
+  if (response.results.length === 0) {
+    console.log('No results found.');
+    return;
+  }
+
+  console.log(`Results (${response.results.length} from ${response.provider}):`);
+  console.log('─'.repeat(60));
+
+  for (const r of response.results) {
+    console.log(`  ${r.file}:${r.start_line}-${r.end_line}  (score: ${r.score})`);
+    const snippetLines = r.snippet.split('\n').slice(0, 10);
+    for (const line of snippetLines) {
+      console.log(`    ${line}`);
+    }
+    if (r.context) {
+      console.log(`    // ${r.context}`);
+    }
+    console.log('');
+  }
 }
 
 function knowledgeArchive(projectRoot: string, featureId: string): void {

@@ -91,7 +91,7 @@ switch (command) {
   case 'knowledge': {
     const sub = args[1];
     if (!sub || sub.startsWith('--')) {
-      console.error('Usage: chimera knowledge <check|read|archive> [args]');
+      console.error('Usage: chimera knowledge <check|read|archive|search> [args]');
       process.exit(1);
     }
     knowledge(projectRoot, sub, args.slice(2));

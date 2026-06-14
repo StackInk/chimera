@@ -27,6 +27,7 @@ fi
 # ─── Parse state ──────────────────────────────────────────────────────
 VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
 PRESET=$(grep -o '"preset"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
+CURRENT_FEATURE_NAME=""
 
 # Output warnings first if any
 if [ -n "$WARNINGS" ]; then
@@ -41,6 +42,7 @@ echo ""
 # ─── Active features ──────────────────────────────────────────────────
 FEATURES=$(grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | grep -o '"[^"]*"$' | tr -d '"')
 PHASES=$(grep -o '"phase"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | grep -o '"[^"]*"$' | tr -d '"')
+FEATURE_NAMES=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" | grep -o '"[^"]*"$' | tr -d '"')
 
 if [ -z "$FEATURES" ]; then
   echo "  No active features. Start by describing what you want to build."
@@ -53,8 +55,9 @@ else
   done
   echo ""
 
-  # Get current phase of most recent feature
+  # Get current phase and name of most recent feature
   CURRENT_PHASE=$(echo "$PHASES" | tail -1)
+  CURRENT_FEATURE_NAME=$(echo "$FEATURE_NAMES" | tail -1)
   echo "  Current Phase: $CURRENT_PHASE"
   echo ""
 fi
@@ -210,6 +213,54 @@ if [ -d "$BLOCKS_DIR" ] && [ -n "$(ls "$BLOCKS_DIR"/*.json 2>/dev/null)" ]; then
     echo "  ─── Drift Detection ───"
     echo -e "$DRIFT_WARNINGS"
   fi
+fi
+
+# ─── External Knowledge Providers ────────────────────────────────────
+CODEGRAPH_ENABLED=$(grep -A5 "codegraph:" "$CONFIG_FILE" 2>/dev/null | grep "enabled: true")
+CODEGRAPH_BIN=$(grep -A5 "codegraph:" "$CONFIG_FILE" 2>/dev/null | grep "binary:" | awk '{print $2}' | tr -d '"' | tr -d "'")
+CODEGRAPH_BIN="${CODEGRAPH_BIN:-codegraph}"
+
+if [ -n "$CODEGRAPH_ENABLED" ] && [ -n "$CURRENT_PHASE" ]; then
+  case "$CURRENT_PHASE" in
+    plan|implement|review)
+      if command -v "$CODEGRAPH_BIN" &> /dev/null; then
+        # Build query from current feature context
+        CODEGRAPH_QUERY="${CURRENT_FEATURE_NAME:-codebase}"
+        CODEGRAPH_MAX=$(grep -A5 "codegraph:" "$CONFIG_FILE" 2>/dev/null | grep "max_results:" | awk '{print $2}' | tr -d '"')
+        CODEGRAPH_MAX="${CODEGRAPH_MAX:-5}"
+
+        CODEGRAPH_OUTPUT=$("$CODEGRAPH_BIN" search "$CODEGRAPH_QUERY" --format json --max-results "$CODEGRAPH_MAX" 2>/dev/null || true)
+
+        if [ -n "$CODEGRAPH_OUTPUT" ] && [ "$CODEGRAPH_OUTPUT" != "[]" ]; then
+          echo "  ─── Code Graph Context (codegraph) ───"
+          echo "$CODEGRAPH_OUTPUT" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    results = data.get('results', data) if isinstance(data, dict) else data
+    if isinstance(results, list):
+        for r in results[:${CODEGRAPH_MAX}]:
+            f = r.get('file', '?')
+            sl = r.get('start_line', r.get('startLine', '?'))
+            el = r.get('end_line', r.get('endLine', '?'))
+            sc = r.get('score', 0)
+            snippet = r.get('snippet', r.get('content', ''))
+            print(f'    [{f}:{sl}-{el}] (score: {sc})')
+            for line in snippet.split(chr(10))[:10]:
+                print(f'      {line}')
+            print()
+except Exception:
+    pass
+" 2>/dev/null || echo "    (codegraph output could not be parsed)"
+          echo ""
+        fi
+      else
+        echo "  ⚠ codegraph enabled but binary not found ($CODEGRAPH_BIN)"
+        echo "    Install: https://github.com/github/code-graph"
+        echo ""
+      fi
+      ;;
+  esac
 fi
 
 # ─── Constitution summary ────────────────────────────────────────────

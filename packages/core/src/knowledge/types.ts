@@ -35,3 +35,28 @@ export interface KnowledgeIndexEntry {
   source_feature: string;
   file_path: string;
 }
+
+// ─── External Knowledge Providers ────────────────────────────────────
+
+export interface KnowledgeProviderConfig {
+  enabled: boolean;
+  type: string;
+  binary?: string;
+  max_results?: number;
+  timeout_ms?: number;
+}
+
+export interface CodeSearchResult {
+  file: string;
+  start_line: number;
+  end_line: number;
+  score: number;
+  snippet: string;
+  context?: string;
+}
+
+export interface CodeSearchResponse {
+  query: string;
+  results: CodeSearchResult[];
+  provider: string;
+}

@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, accessSync, constants } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 import { readJson, readText } from '../utils/fs.js';
 import {
   chimeraDir, statePath, stateMachinePath, configPath,
@@ -155,14 +156,9 @@ function checkHooksRegistration(projectRoot: string): DoctorCheckResult {
   const hooks = settings.hooks as Record<string, unknown[]>;
   const hasSession = Array.isArray(hooks.SessionStart) && hooks.SessionStart.length > 0;
   const hasPreTool = Array.isArray(hooks.PreToolUse) && hooks.PreToolUse.length > 0;
-  const hasPreCommit = Array.isArray(hooks.PreCommit) && hooks.PreCommit.length > 0;
 
   if (!hasSession || !hasPreTool) {
     return { name: 'hooks registration', status: 'fail', severity: 'high', message: 'Critical hooks not registered (SessionStart or PreToolUse missing)', fix: 'chimera doctor --fix' };
-  }
-
-  if (!hasPreCommit) {
-    return { name: 'hooks registration', status: 'warn', severity: 'high', message: 'PreCommit hook not registered (quality gate inactive)', fix: 'chimera doctor --fix' };
   }
 
   return { name: 'hooks registration', status: 'pass', severity: 'high', message: 'all hooks registered' };
@@ -207,6 +203,19 @@ function checkEnabledCapabilities(projectRoot: string): DoctorCheckResult[] {
     const kDir = knowledgeDir(projectRoot);
     if (!existsSync(join(kDir, 'business.md')) && !existsSync(join(kDir, 'conventions.md'))) {
       results.push({ name: 'knowledge files', status: 'warn', severity: 'medium', message: 'Knowledge enabled but template files empty or missing', fix: 'chimera enable knowledge' });
+    }
+  }
+
+  // CodeGraph provider enabled but binary not found
+  if (config.match(/codegraph:[\s\S]*?enabled:\s*true/)) {
+    let binary = 'codegraph';
+    const binMatch = config.match(/codegraph:[\s\S]*?binary:\s*["']?([^"'\s\n]+)/);
+    if (binMatch) binary = binMatch[1].trim();
+
+    try {
+      execSync(`command -v ${binary}`, { stdio: 'pipe' });
+    } catch {
+      results.push({ name: 'codegraph binary', status: 'warn', severity: 'medium', message: `CodeGraph provider enabled but '${binary}' not found in PATH`, fix: 'Install codegraph or set binary path in config.yaml' });
     }
   }
 

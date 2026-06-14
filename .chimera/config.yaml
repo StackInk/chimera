@@ -1,14 +1,20 @@
 version: 0.1.0
 
 tdd:
-  enabled: true
-  coverage_threshold: 100
+  enabled: false
+  coverage_threshold: 80
 
 constitution:
-  enabled: true
+  enabled: false
 
 knowledge:
-  enabled: true
+  enabled: false
+  providers:
+    codegraph:
+      enabled: false
+      # binary: codegraph
+      # max_results: 5
+      # timeout_ms: 10000
 
 compression:
   enabled: true

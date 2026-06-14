@@ -1,13 +1,14 @@
 import { existsSync, cpSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { execSync } from 'node:child_process';
 import { readText, writeText, ensureDir } from '@chimera/core';
 import { chimeraDir, configPath, constitutionPath, knowledgeDir } from '@chimera/core';
 
 const TEMPLATES_DIR = resolve(import.meta.dirname, '../../..', 'templates');
 
-export type Capability = 'constitution' | 'tdd' | 'knowledge' | 'compression';
+export type Capability = 'constitution' | 'tdd' | 'knowledge' | 'compression' | 'codegraph';
 
-const VALID_CAPABILITIES: Capability[] = ['constitution', 'tdd', 'knowledge', 'compression'];
+const VALID_CAPABILITIES: Capability[] = ['constitution', 'tdd', 'knowledge', 'compression', 'codegraph'];
 
 export function enable(projectRoot: string, capability: string): void {
   if (!existsSync(chimeraDir(projectRoot))) {
@@ -39,6 +40,9 @@ export function enable(projectRoot: string, capability: string): void {
       break;
     case 'compression':
       enableCompression(config, projectRoot);
+      break;
+    case 'codegraph':
+      enableCodegraph(projectRoot, config);
       break;
   }
 }
@@ -101,4 +105,38 @@ function enableCompression(config: string, projectRoot: string): void {
   writeText(configPath(projectRoot), updated);
 
   console.log('[Chimera] Compression enabled (engine: builtin).');
+}
+
+function enableCodegraph(projectRoot: string, config: string): void {
+  // Check if codegraph binary is installed
+  let installed = false;
+  try {
+    execSync('command -v codegraph', { stdio: 'pipe' });
+    installed = true;
+  } catch { /* not installed */ }
+
+  // Enable in config
+  const updated = config.replace(
+    /codegraph:\s*\n\s*enabled:\s*false/,
+    'codegraph:\n      enabled: true',
+  );
+  writeText(configPath(projectRoot), updated);
+
+  console.log('[Chimera] CodeGraph provider enabled.');
+
+  if (installed) {
+    console.log('  codegraph binary detected. Ready to use.');
+  } else {
+    console.log('  ⚠ codegraph binary not found in PATH.');
+    console.log('  Install it: https://github.com/github/code-graph');
+    console.log('  Or set binary path in config.yaml:');
+    console.log('    knowledge.providers.codegraph.binary: /path/to/codegraph');
+  }
+
+  console.log('');
+  console.log('  Search usage:');
+  console.log('    chimera knowledge search "your query"');
+  console.log('');
+  console.log('  Auto-activation:');
+  console.log('    Session-start hook will query codegraph in plan/implement/review phases.');
 }
