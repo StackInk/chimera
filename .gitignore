@@ -5,3 +5,13 @@ dist/
 *.log
 coverage/
 .env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.cert
+.npmrc
+.idea/
+.vscode/

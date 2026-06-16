@@ -63,6 +63,7 @@ fi
 if [ -n "$CURRENT_PHASE" ] && [ -f "$SM_FILE" ]; then
   # Extract skills for current phase from state-machine.yaml
   IN_PHASE=0
+  IN_SKILLS=0
   SKILLS=""
   while IFS= read -r line; do
     if echo "$line" | grep -q "^  ${CURRENT_PHASE}:"; then
@@ -71,11 +72,19 @@ if [ -n "$CURRENT_PHASE" ] && [ -f "$SM_FILE" ]; then
     fi
     if [ $IN_PHASE -eq 1 ] && echo "$line" | grep -q "^  [a-z]"; then
       IN_PHASE=0
+      IN_SKILLS=0
       continue
     fi
-    if [ $IN_PHASE -eq 1 ] && echo "$line" | grep -q "^      - "; then
+    if [ $IN_PHASE -eq 1 ] && echo "$line" | grep -q "^    skills:"; then
+      IN_SKILLS=1
+      continue
+    fi
+    if [ $IN_PHASE -eq 1 ] && [ $IN_SKILLS -eq 1 ] && echo "$line" | grep -q "^      - "; then
       SKILL=$(echo "$line" | sed 's/^      - //')
       SKILLS="$SKILLS $SKILL"
+    fi
+    if [ $IN_PHASE -eq 1 ] && [ $IN_SKILLS -eq 1 ] && echo "$line" | grep -q "^    [a-z]"; then
+      IN_SKILLS=0
     fi
   done < "$SM_FILE"
 

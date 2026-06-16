@@ -98,16 +98,21 @@ function registerHooks(projectRoot: string): void {
   const existing = readJson<Record<string, unknown>>(settingsPath) || {};
   const hooks = {
     PreToolUse: [
-      { matcher: 'Write|Edit', command: '.chimera/hooks/pre-tool-use.sh "$TOOL_NAME" "$FILE_PATH"' },
+      {
+        matcher: 'Write|Edit',
+        hooks: [{ type: 'command', command: '.chimera/hooks/pre-tool-use.sh "$TOOL_NAME" "$FILE_PATH"' }],
+      },
     ],
     PostToolUse: [
-      { matcher: 'Write|Edit', command: '.chimera/hooks/post-tool-use.sh "$TOOL_NAME" "$FILE_PATH"' },
-    ],
-    PreCommit: [
-      { command: '.chimera/hooks/pre-commit.sh' },
+      {
+        matcher: 'Write|Edit',
+        hooks: [{ type: 'command', command: '.chimera/hooks/post-tool-use.sh "$TOOL_NAME" "$FILE_PATH"' }],
+      },
     ],
     SessionStart: [
-      { command: '.chimera/hooks/session-start.sh' },
+      {
+        hooks: [{ type: 'command', command: '.chimera/hooks/session-start.sh' }],
+      },
     ],
   };
 
