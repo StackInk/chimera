@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".chimera/hooks/pre-tool-use.sh \"$TOOL_NAME\" \"$FILE_PATH\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".chimera/hooks/post-tool-use.sh \"$TOOL_NAME\" \"$FILE_PATH\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".chimera/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
