@@ -1,5 +1,5 @@
 {
-  "name": "@chimera/core",
+  "name": "@chimera-ai/chimera-core",
   "version": "0.1.0",
   "description": "Chimera core library - state machine, knowledge, compression",
   "type": "module",

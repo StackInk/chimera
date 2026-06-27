@@ -1,5 +1,5 @@
 {
-  "name": "@chimera/cli",
+  "name": "@chimera-ai/chimera-cli",
   "version": "0.1.0",
   "description": "Chimera CLI - State-driven AI development framework",
   "type": "module",
@@ -22,7 +22,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@chimera/core": "*"
+    "@chimera-ai/chimera-core": "*"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
