@@ -20,10 +20,10 @@
 
 ```bash
 # 全局安装
-npm install -g @chimera/cli
+npm install -g @chimera-ai/chimera-cli
 
 # 或直接使用 npx
-npx @chimera/cli init
+npx @chimera-ai/chimera-cli init
 ```
 
 ## 快速开始
