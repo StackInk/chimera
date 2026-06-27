@@ -12,6 +12,5 @@ coverage/
 *.pfx
 *.jks
 *.cert
-.npmrc
 .idea/
 .vscode/
