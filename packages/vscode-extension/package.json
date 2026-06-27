@@ -7,7 +7,9 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
     "workspaceContains:.chimera/state.json"
   ],
@@ -67,8 +69,13 @@
     "test": "echo 'VS Code extension tests require vscode test runner'"
   },
   "devDependencies": {
+    "@types/node": "^26.0.1",
     "@types/vscode": "^1.85.0",
     "typescript": "^5.5.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StackInk/chimera.git"
+  }
 }

@@ -1,0 +1,14 @@
+.vscode/**
+.gitignore
+.git/**
+coverage
+src/**
+src/
+*.map
+*.ts
+.vscode-test/
+test/
+yarn.lock
+package-lock.json
+tsconfig.json
+README.md
